@@ -177,6 +177,8 @@ model = metrics["model"]
 with tab_model:
     st.subheader("Modelo y métricas")
     st.write("Modelo utilizado: Random Forest con búsqueda de hiperparámetros.")
+    st.write("")  # espacio visual
+    st.write("")
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Accuracy", f"{metrics['accuracy']:.3f}")
@@ -184,8 +186,14 @@ with tab_model:
     col3.metric("Recall", f"{metrics['recall']:.3f}")
     col4.metric("F1-score", f"{metrics['f1']:.3f}")
 
+    st.write("")
+    st.divider()
+
     st.markdown("**Mejores hiperparámetros encontrados**")
     st.json(metrics["best_params"])
+
+    st.write("")
+    st.divider()
 
     st.markdown("**Matriz de confusión**")
     cm = metrics["confusion_matrix"]
@@ -206,6 +214,7 @@ with tab_model:
     fig_cm.tight_layout()
     st.pyplot(fig_cm)
 
+    st.write("")
     st.markdown(
         """
         Flujo seguido en el modelo:
@@ -216,6 +225,7 @@ with tab_model:
         5. Evaluación del modelo en el conjunto de prueba usando Accuracy, Precision, Recall y F1.
         """
     )
+
 
 
 with tab_predict:
