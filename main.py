@@ -12,7 +12,7 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support, con
 
 st.set_page_config(
     page_title="Iris species classification",
-    layout="wide"
+    layout="centered"
 )
 
 st.title("Iris species classification")
@@ -97,7 +97,7 @@ with tab_data:
         for j in range(len(feature_cols)):
             ax.text(j, i, f"{corr.iloc[i, j]:.2f}", ha="center", va="center", color="black")
     fig_corr.tight_layout()
-    st.pyplot(fig_corr)
+    st.pyplot(fig_corr, use_container_width=False)
 
     st.markdown("**Histogramas por característica**")
     cols = st.multiselect(
@@ -115,7 +115,7 @@ with tab_data:
         ax_h.set_ylabel("Frecuencia")
         ax_h.legend()
         fig_h.tight_layout()
-        st.pyplot(fig_h)
+        st.pyplot(fig_h, use_container_width=False)
 
 
 @st.cache_resource
