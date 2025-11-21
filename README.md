@@ -84,6 +84,4 @@ El flujo que se implementa en `main.py` sigue la idea vista en clase:
 - `README.md` – descripción del proyecto y pasos para correrlo.
 - `Iris.csv` – dataset usado para entrenar y evaluar el modelo (no se sube desde aquí, se descarga desde Kaggle y se coloca en la carpeta).
 
-## Autores
 
-- Escribe aquí los nombres de los integrantes del grupo.
