@@ -75,7 +75,7 @@ El flujo que se implementa en `main.py` sigue la idea vista en clase:
    streamlit run main.py
    ```
 
-6. Abrir el enlace que muestra la consola (normalmente `http://localhost:8501`) y explorar el dashboard.
+
 
 
 
