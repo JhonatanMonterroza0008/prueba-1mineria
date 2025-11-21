@@ -77,11 +77,6 @@ El flujo que se implementa en `main.py` sigue la idea vista en clase:
 
 6. Abrir el enlace que muestra la consola (normalmente `http://localhost:8501`) y explorar el dashboard.
 
-## Archivos principales
 
-- `main.py` – aplicación Streamlit con todo el flujo (EDA, modelo y predicción).
-- `requirements.txt` – librerías necesarias para ejecutar el proyecto.
-- `README.md` – descripción del proyecto y pasos para correrlo.
-- `Iris.csv` – dataset usado para entrenar y evaluar el modelo (no se sube desde aquí, se descarga desde Kaggle y se coloca en la carpeta).
 
 
