@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 import plotly.express as px
@@ -44,12 +43,9 @@ if "Id" in df.columns:
 st.title("Iris species classification")
 st.caption("Small ML project with Streamlit")
 
-
-# --- Tabs ---
 tab_data, tab_model, tab_pred = st.tabs(["📊 Data", "🤖 Model", "🌸 Predict"])
 
 
-# --- Simple outlier count (IQR) ---
 def count_outliers(s):
     q1, q3 = s.quantile([0.25, 0.75])
     iqr = q3 - q1
@@ -57,7 +53,6 @@ def count_outliers(s):
     return int(((s < lo) | (s > hi)).sum())
 
 
-# --- Train model ---
 @st.cache_resource
 def train_model(data):
     X = data[FEATURE_COLS].values
@@ -102,7 +97,7 @@ model, metrics, cm, best_params = train_model(df)
 # =======================
 with tab_data:
     st.subheader("Quick look")
-    st.caption("Just to see what we are working with.")
+    st.caption("Just to see the dataset.")
     st.dataframe(df.head(), use_container_width=True)
 
     c1, c2, c3 = st.columns(3)
@@ -119,18 +114,6 @@ with tab_data:
     corr = df[FEATURE_COLS].corr()
     st.plotly_chart(px.imshow(corr), use_container_width=True)
 
-    st.markdown("**Histograms**")
-    cols = st.multiselect("Features", FEATURE_COLS, default=FEATURE_COLS)
-    for col in cols:
-        fig, ax = plt.subplots(figsize=(5, 3))
-        for sp, g in df.groupby(TARGET_COL):
-            ax.hist(g[col], bins=10, alpha=0.5, label=str(sp))
-        ax.set_title(col)
-        ax.set_xlabel(col)
-        ax.set_ylabel("Freq")
-        ax.legend()
-        st.pyplot(fig)
-
     with st.expander("Data checks"):
         st.write("Missing values per column")
         st.dataframe(df[FEATURE_COLS + [TARGET_COL]].isna().sum())
@@ -139,7 +122,7 @@ with tab_data:
         st.write("Outliers (IQR rule)")
         st.dataframe(pd.Series(out, name="count"))
 
-        st.caption("Dataset looks clean, so nothing heavy to fix here.")
+        st.caption("Dataset looks clean, so no big fixes needed.")
 
 
 # =======================
@@ -147,21 +130,19 @@ with tab_data:
 # =======================
 with tab_model:
     st.subheader("Metrics")
-    st.caption("Model trained with 80/20 split and 5-fold CV.")
+    st.caption("80/20 split and 5-fold CV.")
     mcols = st.columns(4)
     for i, k in enumerate(["Accuracy", "Precision", "Recall", "F1"]):
         mcols[i].metric(k, f"{metrics[k]:.3f}")
 
     st.markdown("**Best parameters found**")
-    st.caption("These are the settings that gave the best CV score.")
+    st.caption("Settings with the best CV score.")
 
-    # Pretty view as small cards
     pcols = st.columns(len(best_params))
     for col, (k, v) in zip(pcols, best_params.items()):
         short_name = k.replace("rf__", "").replace("_", " ")
         col.metric(short_name, v)
 
-    # Also show as a clean table
     params_df = pd.DataFrame(
         [(k.replace("rf__", ""), v) for k, v in best_params.items()],
         columns=["Parameter", "Value"]
@@ -191,7 +172,7 @@ with tab_model:
 # =======================
 with tab_pred:
     st.subheader("Predict a new flower")
-    st.caption("Type values and see what the model says.")
+    st.caption("Type values and check the prediction.")
 
     ranges = {
         c: (float(df[c].min()), float(df[c].max()), float(df[c].mean()))
