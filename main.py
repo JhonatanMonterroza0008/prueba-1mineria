@@ -16,6 +16,7 @@ FEATURE_COLS = ["SepalLengthCm", "SepalWidthCm", "PetalLengthCm", "PetalWidthCm"
 TARGET_COL = "Species"
 
 
+# --- Load data ---
 @st.cache_data
 def load_data():
     for p in ("Iris.csv", "iris.csv"):
@@ -39,12 +40,16 @@ df.columns = [c.strip() for c in df.columns]
 if "Id" in df.columns:
     df.drop(columns="Id", inplace=True)
 
-st.title("Iris species classification")
-st.caption("Random Forest + Streamlit demo")
 
+st.title("Iris species classification")
+st.caption("Small ML project with Streamlit")
+
+
+# --- Tabs ---
 tab_data, tab_model, tab_pred = st.tabs(["📊 Data", "🤖 Model", "🌸 Predict"])
 
 
+# --- Simple outlier count (IQR) ---
 def count_outliers(s):
     q1, q3 = s.quantile([0.25, 0.75])
     iqr = q3 - q1
@@ -52,6 +57,7 @@ def count_outliers(s):
     return int(((s < lo) | (s > hi)).sum())
 
 
+# --- Train model ---
 @st.cache_resource
 def train_model(data):
     X = data[FEATURE_COLS].values
@@ -90,8 +96,13 @@ def train_model(data):
 
 model, metrics, cm, best_params = train_model(df)
 
+
+# =======================
+# 📊 DATA TAB
+# =======================
 with tab_data:
     st.subheader("Quick look")
+    st.caption("Just to see what we are working with.")
     st.dataframe(df.head(), use_container_width=True)
 
     c1, c2, c3 = st.columns(3)
@@ -128,17 +139,34 @@ with tab_data:
         st.write("Outliers (IQR rule)")
         st.dataframe(pd.Series(out, name="count"))
 
-        st.caption("Iris is pretty clean, so counts are low.")
+        st.caption("Dataset looks clean, so nothing heavy to fix here.")
 
 
+# =======================
+# 🤖 MODEL TAB
+# =======================
 with tab_model:
     st.subheader("Metrics")
+    st.caption("Model trained with 80/20 split and 5-fold CV.")
     mcols = st.columns(4)
     for i, k in enumerate(["Accuracy", "Precision", "Recall", "F1"]):
         mcols[i].metric(k, f"{metrics[k]:.3f}")
 
-    st.markdown("**Best params**")
-    st.json(best_params)
+    st.markdown("**Best parameters found**")
+    st.caption("These are the settings that gave the best CV score.")
+
+    # Pretty view as small cards
+    pcols = st.columns(len(best_params))
+    for col, (k, v) in zip(pcols, best_params.items()):
+        short_name = k.replace("rf__", "").replace("_", " ")
+        col.metric(short_name, v)
+
+    # Also show as a clean table
+    params_df = pd.DataFrame(
+        [(k.replace("rf__", ""), v) for k, v in best_params.items()],
+        columns=["Parameter", "Value"]
+    )
+    st.table(params_df)
 
     st.markdown("**Confusion matrix**")
     fig_cm, ax_cm = plt.subplots(figsize=(4, 4))
@@ -147,19 +175,23 @@ with tab_model:
     ax_cm.set_yticks(range(len(model.classes_)))
     ax_cm.set_xticklabels(model.classes_, rotation=45, ha="right")
     ax_cm.set_yticklabels(model.classes_)
+
     for i in range(len(model.classes_)):
         for j in range(len(model.classes_)):
             ax_cm.text(j, i, cm[i, j], ha="center", va="center", color="black")
+
     ax_cm.set_xlabel("Predicted")
     ax_cm.set_ylabel("True")
     fig_cm.colorbar(im, ax=ax_cm, fraction=0.046, pad=0.04)
     st.pyplot(fig_cm)
 
-    st.caption("Split 80/20, scaler + Random Forest, 5-fold CV.")
 
-
+# =======================
+# 🌸 PREDICT TAB
+# =======================
 with tab_pred:
     st.subheader("Predict a new flower")
+    st.caption("Type values and see what the model says.")
 
     ranges = {
         c: (float(df[c].min()), float(df[c].max()), float(df[c].mean()))
